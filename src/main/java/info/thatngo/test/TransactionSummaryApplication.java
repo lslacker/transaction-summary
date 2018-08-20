@@ -35,7 +35,7 @@ public class TransactionSummaryApplication implements CommandLineRunner {
         
         Stream<Transaction> transactions = processor.read("/home/lmai/Downloads/input.txt");
         
-        transactions.forEach(t -> LOG.info(t.getRecordType()));
+        transactions.forEach(t -> LOG.info(t.toString()));
     }
 	
 }

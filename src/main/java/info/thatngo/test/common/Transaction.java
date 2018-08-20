@@ -31,7 +31,6 @@ public class Transaction {
 	@CsvField(fromPos=38, toPos=45, format="YYYYMMDD")
 	private Date expirationDate;
 	
-	
 	private Double quantityLong;
 	private Double quantityShort;
 	

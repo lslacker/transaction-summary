@@ -71,6 +71,7 @@ public class FixedWidthProcessor<T> {
 	private T parseRow(final String line) {
 		
 		Constructor<T> constructor;
+		
 		try {
 			constructor = entityClass.getConstructor();
 			final T instance = constructor.newInstance();
