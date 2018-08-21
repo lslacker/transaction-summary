@@ -7,10 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
-public @interface CsvField {
-	
-	public int fromPos();
-	public int toPos();
+public @interface OutputField {
+	public String name();
 	public String format() default "";
-	
 }

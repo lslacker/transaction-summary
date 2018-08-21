@@ -2,36 +2,41 @@ package info.thatngo.test.common;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 public class Transaction {
 	
-	@CsvField(fromPos=1, toPos=3)
+	@InputField(fromPos=1, toPos=3)
 	private String recordType;
 	
-	@CsvField(fromPos=4, toPos=7)
+	@InputField(fromPos=4, toPos=7)
 	private String clientType;
 	
-	@CsvField(fromPos=8, toPos=11)
+	@InputField(fromPos=8, toPos=11)
 	private String clientNumber;
 	
-	@CsvField(fromPos=12, toPos=15)
+	@InputField(fromPos=12, toPos=15)
 	private String accountNumber;
 	
-	@CsvField(fromPos=16, toPos=19)
+	@InputField(fromPos=16, toPos=19)
 	private String subAccountNumber;
 	
-	@CsvField(fromPos=28, toPos=31)
+	@InputField(fromPos=28, toPos=31)
 	private String exchangeCode;
 	
-	@CsvField(fromPos=26, toPos=27)
+	@InputField(fromPos=26, toPos=27)
 	private String productGroupCode;
 	
-	@CsvField(fromPos=32, toPos=37)
+	@InputField(fromPos=32, toPos=37)
 	private String symbol;
 	
-	@CsvField(fromPos=38, toPos=45, format="YYYYMMDD")
+	@InputField(fromPos=38, toPos=45, format="YYYYMMDD")
 	private Date expirationDate;
 	
+	@InputField(fromPos=53, toPos=62)
 	private Double quantityLong;
+	
+	@InputField(fromPos=64, toPos=73)
 	private Double quantityShort;
 	
 	public String getRecordType() {
@@ -100,4 +105,49 @@ public class Transaction {
 	public void setQuantityShort(Double quantityShort) {
 		this.quantityShort = quantityShort;
 	}
+	
+	@Override
+	public String toString() {
+		return "Transaction [recordType=" + recordType + ", clientType=" + clientType + ", clientNumber=" + clientNumber
+				+ ", accountNumber=" + accountNumber + ", subAccountNumber=" + subAccountNumber + ", exchangeCode="
+				+ exchangeCode + ", productGroupCode=" + productGroupCode + ", symbol=" + symbol + ", expirationDate="
+				+ expirationDate + ", quantityLong=" + quantityLong + ", quantityShort=" + quantityShort + "]";
+	}
+	
+	public String getClientInformation() {
+		return String.format("%s,%s,%s,%s", clientType, clientNumber, accountNumber, subAccountNumber);
+	}
+	
+	public String getProductInformation() {
+		return String.format("%s,%s,%s,%s", exchangeCode, productGroupCode, symbol, expirationDate);
+	}
+	
+	public double getTotalTransactionAmount() {
+		return quantityLong - quantityShort;
+	}
+	
+	@Override
+    public boolean equals(Object o) {
+
+		if (o == this) return true;
+        if (!(o instanceof Transaction)) {
+            return false;
+        }
+
+        Transaction anotherTransaction = (Transaction) o;
+
+        return new EqualsBuilder()
+                .append(this.getClientInformation(), anotherTransaction.getClientInformation())
+                .append(this.getProductInformation(), anotherTransaction.getProductInformation())
+                .isEquals();
+    }
+
+    //Idea from effective Java : Item 9
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + this.getClientInformation().hashCode();
+        result = 31 * result + this.getProductInformation().hashCode();
+        return result;
+    }
 }
