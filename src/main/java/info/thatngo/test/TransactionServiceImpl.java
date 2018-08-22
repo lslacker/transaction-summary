@@ -8,12 +8,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.stereotype.Service;
+
 import com.google.common.collect.Lists;
 
 import info.thatngo.test.common.Summary;
 import info.thatngo.test.common.Transaction;
 import info.thatngo.test.common.fixedwidth.FixedWidthProcessor;
 
+@Service
 public class TransactionServiceImpl implements TransactionService {
 
 	@Override

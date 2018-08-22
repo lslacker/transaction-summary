@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +55,7 @@ public class FixedWidthProcessor<T> {
 		if (columnInfoMap != null) {
 			return;
 		}
-		  zv1`
+		
 		columnPositionInfoMap = Maps.newHashMap();
 		columnInfoMap = Maps.newLinkedHashMap();
 		
@@ -93,6 +94,7 @@ public class FixedWidthProcessor<T> {
 		//header is column Name
 		if (writeHeader) {
 			//write header
+				
 		}
 		
 		//start write row
@@ -101,8 +103,20 @@ public class FixedWidthProcessor<T> {
 		writer.close();
 	}
 	
-	public void writeRow(BufferedWriter writer, T row) {
-		
+	public void writeRow(BufferedWriter writer, T row) throws IOException {
+		Stream<String> data = this.columnInfoMap.entrySet().stream().map(c -> {
+			Field aField = c.getKey();
+			Class<?> type = aField.getType();
+			try {
+				Object o = aField.get(row);
+				return String.valueOf(o);
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				
+			}
+			return null;
+		});
+		String line = data.collect(Collectors.joining(","));
+		writer.write(line);
 	}
 	
 	private T parseRow(final String line) {
