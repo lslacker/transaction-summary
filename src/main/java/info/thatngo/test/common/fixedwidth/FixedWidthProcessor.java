@@ -10,7 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,6 +25,7 @@ import com.google.common.collect.Maps;
 
 import info.thatngo.test.common.InputField;
 import info.thatngo.test.common.OutputField;
+import info.thatngo.test.common.ThrowingConsumer;
 import info.thatngo.test.converter.Converter;
 import info.thatngo.test.converter.DateConverter;
 import info.thatngo.test.converter.NumberConverter;
@@ -31,10 +34,11 @@ import info.thatngo.test.converter.NumberConverter;
 public class FixedWidthProcessor<T> {
 	
     private static Logger LOGGER = LoggerFactory.getLogger(FixedWidthProcessor.class);
+    private static final String NEW_LINE = System.lineSeparator();
     private static final Map<String, Converter<?>> CONVERTERLOOKUP = Maps.newHashMap();
 	private Class<T> entityClass;
 	private Map<Field, Pair<Integer, Integer>> columnPositionInfoMap;
-	private Map<Field, ColumnInfo<T>> columnInfoMap;
+	private Map<Field, ColumnInfo> columnInfoMap;
 	
 	static {
 		CONVERTERLOOKUP.put("Date", new DateConverter());
@@ -67,7 +71,7 @@ public class FixedWidthProcessor<T> {
 				String format = inputField.format();
 				Pair<Integer, Integer> coord = Pair.of(fromPos, toPos);
 				columnPositionInfoMap.put(field, coord);
-				ColumnInfo<T> columnInfo = new ColumnInfo<>(fromPos, toPos, format);
+				ColumnInfo columnInfo = new ColumnInfo(fromPos, toPos, format);
 				columnInfoMap.put(field, columnInfo);
 			}
 			
@@ -76,7 +80,7 @@ public class FixedWidthProcessor<T> {
 			if (outputField != null) {
 				String columnName = outputField.name();
 				String format = outputField.format();
-				ColumnInfo<T> columnInfo = new ColumnInfo<>(columnName, format);
+				ColumnInfo columnInfo = new ColumnInfo(columnName, format);
 				columnInfoMap.put(field, columnInfo);
 			}
 		}
@@ -91,25 +95,40 @@ public class FixedWidthProcessor<T> {
 	public void write(String output, Collection<T> rows, boolean writeHeader) throws IOException {
 		getConfigFromEntity();
 		BufferedWriter writer = new BufferedWriter(new FileWriter(output));
+		
 		//header is column Name
 		if (writeHeader) {
 			//write header
-				
+			List<String> headerRow = this.columnInfoMap.entrySet().stream().map(c -> {
+				return c.getValue().getColumnName();
+			}).collect(Collectors.toList());
+			writeHeader(writer, headerRow);
 		}
 		
 		//start write row
-		rows.stream().forEach(row -> writeRow(writer, row));
+		rows.stream().forEach(throwingConsumerWrapper(row -> writeRow(writer, row)));
 		
 		writer.close();
+	}
+	
+	public void writeHeader(BufferedWriter writer, List<String> row) throws IOException {
+		String line = row.stream().collect(Collectors.joining(","));
+		writer.write(line);
+		writer.write(NEW_LINE);
 	}
 	
 	public void writeRow(BufferedWriter writer, T row) throws IOException {
 		Stream<String> data = this.columnInfoMap.entrySet().stream().map(c -> {
 			Field aField = c.getKey();
 			Class<?> type = aField.getType();
+			String formatter = "%s";
 			try {
+				aField.setAccessible(true);
 				Object o = aField.get(row);
-				return String.valueOf(o);
+				if (StringUtils.equalsIgnoreCase(type.getSimpleName(), "Double")) {
+					formatter = c.getValue().getFormat();
+				}
+				return "\"" + String.format(formatter, o)+ "\"";
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				
 			}
@@ -117,6 +136,7 @@ public class FixedWidthProcessor<T> {
 		});
 		String line = data.collect(Collectors.joining(","));
 		writer.write(line);
+		writer.write(NEW_LINE);
 	}
 	
 	private T parseRow(final String line) {
@@ -126,18 +146,18 @@ public class FixedWidthProcessor<T> {
 		try {
 			constructor = entityClass.getConstructor();
 			final T instance = constructor.newInstance();
-			columnPositionInfoMap.entrySet().stream().forEach(x -> {
+			columnInfoMap.entrySet().stream().forEach(x -> {
 				Field field = x.getKey();
-				Pair<Integer, Integer> coord = x.getValue();
-				int start = coord.getLeft();
-				int end = coord.getRight();
+				ColumnInfo cInfo = x.getValue();
+				int start = cInfo.getFromPos();
+				int end = cInfo.getToPos();
 				field.setAccessible(true);
 				Class<?> type = field.getType();
 				
 				try {
 					String value = StringUtils.substring(line, start - 1, end);
 					Map<String, String> context = Maps.newHashMap();
-					context.put("format", "YYYYMMDD");
+					context.put("format", cInfo.getFormat());
 					Converter<?> converter = CONVERTERLOOKUP.getOrDefault(type.getSimpleName(), null);
 					if (converter != null) {
 						field.set(instance, converter.convert(context, value));
@@ -157,7 +177,7 @@ public class FixedWidthProcessor<T> {
 	}
 	
 	
-	public class ColumnInfo<T> {
+	public class ColumnInfo {
 		private final String columnName;
 		private final int fromPos;
 		private final int toPos;
@@ -194,6 +214,17 @@ public class FixedWidthProcessor<T> {
 		}
 	}
 	
+	static <T> Consumer<T> throwingConsumerWrapper(
+			  ThrowingConsumer<T, Exception> throwingConsumer) {
+			  
+	    return fn -> {
+	        try {
+	            throwingConsumer.accept(fn);
+	        } catch (Exception ex) {
+	            throw new RuntimeException(ex);
+	        }
+	    };
+	}
 }
 
 

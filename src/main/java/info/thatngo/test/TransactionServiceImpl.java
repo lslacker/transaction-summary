@@ -8,6 +8,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
@@ -18,6 +20,8 @@ import info.thatngo.test.common.fixedwidth.FixedWidthProcessor;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
+	
+    private static Logger LOGGER = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
 	@Override
 	public List<Summary> summarize(String input) throws IOException {
@@ -39,9 +43,13 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void write(String output, List<Summary> rows, Optional<String> header) {
-		// TODO Auto-generated method stub
-		
+	public void write(String output, List<Summary> rows, boolean withHeader)	 {
+		FixedWidthProcessor<Summary> processor = new FixedWidthProcessor<Summary>(Summary.class);
+		try {
+			processor.write(output, rows, withHeader);
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage());
+		}
 	}
 
 }

@@ -43,36 +43,7 @@ public class TransactionSummaryApplication implements CommandLineRunner {
         String output = args[1];
         
         List<Summary> summaries = service.summarize(input);
-        LOG.info(summaries.toString());
+        service.write(output, summaries, true);
     }
-	
-//	private void console(final String input, final String output) throws IOException {
-//		FixedWidthProcessor<Transaction> processor = new FixedWidthProcessor<Transaction>(Transaction.class);
-//        
-//        Stream<Transaction> transactions = processor.read(input);
-//        
-//        Map<Transaction, Double> map = 
-//        		transactions.collect(Collectors.groupingBy(Function.identity(),
-//        							Collectors.summingDouble(Transaction::getTotalTransactionAmount)));
-//        
-//        List<String> rows = Lists.newArrayList("Client Information,Product Information,Total Transaction Amount");
-//        
-//        rows.addAll(map.entrySet().stream().map(x -> {
-//        	Transaction t = x.getKey();
-//        	Double netTotal = x.getValue();
-//        	return String.format("\"%s\",\"%s\",\"%.2f\"", t.getClientInformation(), t.getProductInformation(), netTotal);
-//        }).collect(Collectors.toList()));
-//        
-//        write(output, rows);
-//	}
-//	
-//	private void write(String outputFilename, List<String> rows) {
-//		Path path = Paths.get(outputFilename);
-//        try {
-//			Files.write(path, rows, StandardCharsets.UTF_8);
-//		} catch (IOException e) {
-//			LOG.error(e.getMessage());
-//		}
-//	}
 	
 }
