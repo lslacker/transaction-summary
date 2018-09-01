@@ -2,7 +2,7 @@ language: java
 
 addons:
   sonarcloud:
-    organization: "transaction-summary"  # the key of the org you chose at step #3
+    organization: "lslacker-github"  # the key of the org you chose at step #3
     token:
       secure: 99da31b43eb1744ad1f4c78ab2ea9a1d1057b7a9
 script:
