@@ -2,7 +2,6 @@ package info.thatngo.test;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import info.thatngo.test.common.Summary;
 

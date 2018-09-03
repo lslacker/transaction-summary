@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,6 @@ public class FixedWidthProcessor<T> {
     private static final String NEW_LINE = System.lineSeparator();
     private static final Map<String, Converter<?>> CONVERTERLOOKUP = Maps.newHashMap();
 	private Class<T> entityClass;
-	private Map<Field, Pair<Integer, Integer>> columnPositionInfoMap;
 	private Map<Field, ColumnInfo> columnInfoMap;
 	
 	static {
@@ -60,7 +58,6 @@ public class FixedWidthProcessor<T> {
 			return;
 		}
 		
-		columnPositionInfoMap = Maps.newHashMap();
 		columnInfoMap = Maps.newLinkedHashMap();
 		
 		for (Field field : entityClass.getDeclaredFields()) {
@@ -69,8 +66,6 @@ public class FixedWidthProcessor<T> {
 				int fromPos = inputField.fromPos();
 				int toPos = inputField.toPos();
 				String format = inputField.format();
-				Pair<Integer, Integer> coord = Pair.of(fromPos, toPos);
-				columnPositionInfoMap.put(field, coord);
 				ColumnInfo columnInfo = new ColumnInfo(fromPos, toPos, format);
 				columnInfoMap.put(field, columnInfo);
 			}
@@ -214,7 +209,7 @@ public class FixedWidthProcessor<T> {
 		}
 	}
 	
-	static <T> Consumer<T> throwingConsumerWrapper(
+	public static <T> Consumer<T> throwingConsumerWrapper(
 			  ThrowingConsumer<T, Exception> throwingConsumer) {
 			  
 	    return fn -> {

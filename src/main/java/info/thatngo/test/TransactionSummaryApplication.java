@@ -36,7 +36,7 @@ public class TransactionSummaryApplication implements CommandLineRunner {
   
         if (args.length < 2) {
         	LOG.info(USAGE);
-        	System.exit(1);
+        	return;
         }
         
         String input = args[0];

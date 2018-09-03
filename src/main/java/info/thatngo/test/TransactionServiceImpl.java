@@ -3,7 +3,6 @@ package info.thatngo.test;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -11,8 +10,6 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import com.google.common.collect.Lists;
 
 import info.thatngo.test.common.Summary;
 import info.thatngo.test.common.Transaction;
