@@ -19,7 +19,7 @@ import info.thatngo.test.common.fixedwidth.FixedWidthProcessor;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 	
-    private final static Logger LOGGER = LoggerFactory.getLogger(TransactionServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
 	@Override
 	public List<Summary> summarize(String input) throws IOException {

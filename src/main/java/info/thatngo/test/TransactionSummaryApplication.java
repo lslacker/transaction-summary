@@ -16,10 +16,10 @@ import info.thatngo.test.common.Summary;
 @SpringBootApplication
 public class TransactionSummaryApplication implements CommandLineRunner {
 	
-	private final static Logger LOG = LoggerFactory
+	private static final Logger LOG = LoggerFactory
 		      .getLogger(TransactionSummaryApplication.class);
 	
-	private final static String USAGE = "2 args required: <input> <output>";
+	private static final String USAGE = "2 args required: <input> <output>";
 	
 	private final TransactionService service;
 	

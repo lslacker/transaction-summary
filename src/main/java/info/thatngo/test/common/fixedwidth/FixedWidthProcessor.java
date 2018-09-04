@@ -33,7 +33,7 @@ import info.thatngo.test.converter.NumberConverter;
 
 public class FixedWidthProcessor<T> {
 	
-    private final static Logger LOGGER = LoggerFactory.getLogger(FixedWidthProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FixedWidthProcessor.class);
     private static final String NEW_LINE = System.lineSeparator();
     private static final Map<String, Converter<?>> CONVERTERLOOKUP = Maps.newHashMap();
 	private Class<T> entityClass;
