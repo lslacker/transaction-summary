@@ -33,7 +33,7 @@ import info.thatngo.test.converter.NumberConverter;
 
 public class FixedWidthProcessor<T> {
 	
-    private static Logger LOGGER = LoggerFactory.getLogger(FixedWidthProcessor.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(FixedWidthProcessor.class);
     private static final String NEW_LINE = System.lineSeparator();
     private static final Map<String, Converter<?>> CONVERTERLOOKUP = Maps.newHashMap();
 	private Class<T> entityClass;
@@ -94,14 +94,13 @@ public class FixedWidthProcessor<T> {
 		
 		//header is column Name
 		if (writeHeader) {
-			//write header
-			List<String> headerRow = this.columnInfoMap.entrySet().stream().map(c -> {
-				return c.getValue().getColumnName();
-			}).collect(Collectors.toList());
+			
+			List<String> headerRow = this.columnInfoMap.entrySet()
+					.stream().map(c -> c.getValue().getColumnName()).collect(Collectors.toList());
 			writeHeader(writer, headerRow);
 		}
 		
-		//start write row
+		
 		rows.stream().forEach(throwingConsumerWrapper(row -> writeRow(writer, row)));
 		
 		writer.close();
@@ -130,6 +129,7 @@ public class FixedWidthProcessor<T> {
 			}
 			return null;
 		});
+		
 		String line = data.collect(Collectors.joining(","));
 		writer.write(line);
 		writer.write(NEW_LINE);
@@ -160,6 +160,7 @@ public class FixedWidthProcessor<T> {
 					} else {
 						field.set(instance, value);
 					}
+					
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					LOGGER.error(e.getMessage());
 				}

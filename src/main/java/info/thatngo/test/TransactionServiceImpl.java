@@ -19,11 +19,11 @@ import info.thatngo.test.common.fixedwidth.FixedWidthProcessor;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 	
-    private static Logger LOGGER = LoggerFactory.getLogger(TransactionServiceImpl.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
 	@Override
 	public List<Summary> summarize(String input) throws IOException {
-		FixedWidthProcessor<Transaction> processor = new FixedWidthProcessor<Transaction>(Transaction.class);
+		FixedWidthProcessor<Transaction> processor = new FixedWidthProcessor<>(Transaction.class);
         
         Stream<Transaction> transactions = processor.read(input);
         
@@ -31,18 +31,17 @@ public class TransactionServiceImpl implements TransactionService {
         		transactions.collect(Collectors.groupingBy(Function.identity(),
         							Collectors.summingDouble(Transaction::getTotalTransactionAmount)));
         
-        List<Summary> rows = map.entrySet().stream().map(x -> {
+        return map.entrySet().stream().map(x -> {
         	Transaction t = x.getKey();
         	Double netTotal = x.getValue();
         	return new Summary(t.getClientInformation(), t.getProductInformation(), netTotal);
         }).collect(Collectors.toList());
         
-        return rows;
 	}
 
 	@Override
 	public void write(File output, List<Summary> rows, boolean withHeader)	 {
-		FixedWidthProcessor<Summary> processor = new FixedWidthProcessor<Summary>(Summary.class);
+		FixedWidthProcessor<Summary> processor = new FixedWidthProcessor<>(Summary.class);
 		try {
 			processor.write(output, rows, withHeader);
 		} catch (IOException e) {
