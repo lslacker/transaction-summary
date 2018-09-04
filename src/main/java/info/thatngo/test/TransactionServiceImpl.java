@@ -1,5 +1,6 @@
 package info.thatngo.test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void write(String output, List<Summary> rows, boolean withHeader)	 {
+	public void write(File output, List<Summary> rows, boolean withHeader)	 {
 		FixedWidthProcessor<Summary> processor = new FixedWidthProcessor<Summary>(Summary.class);
 		try {
 			processor.write(output, rows, withHeader);

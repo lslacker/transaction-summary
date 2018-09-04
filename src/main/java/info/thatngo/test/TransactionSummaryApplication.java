@@ -1,5 +1,6 @@
 package info.thatngo.test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -41,9 +42,9 @@ public class TransactionSummaryApplication implements CommandLineRunner {
         
         String input = args[0];
         String output = args[1];
-        
+        File out = new File(output);
         List<Summary> summaries = service.summarize(input);
-        service.write(output, summaries, true);
+        service.write(out, summaries, true);
     }
 	
 }

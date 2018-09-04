@@ -1,6 +1,7 @@
 package info.thatngo.test.common.fixedwidth;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -87,7 +88,7 @@ public class FixedWidthProcessor<T> {
 		return Files.lines(path).map(l -> parseRow(l));
 	}
 	
-	public void write(String output, Collection<T> rows, boolean writeHeader) throws IOException {
+	public void write(File output, Collection<T> rows, boolean writeHeader) throws IOException {
 		getConfigFromEntity();
 		BufferedWriter writer = new BufferedWriter(new FileWriter(output));
 		
